@@ -17,15 +17,6 @@ jobs:
  
       - name: Clone to VM
         uses: actions/checkout@v4 
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: 'npm'
-      
-      - name: Install Dependencies
-        run: npm ci
       
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6
@@ -83,7 +74,7 @@ jobs:
             exit 1
           fi
 
-          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$  ]]; then
             exit 1
           fi
 
