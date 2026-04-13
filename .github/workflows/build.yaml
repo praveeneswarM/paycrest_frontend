@@ -26,7 +26,7 @@ jobs:
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6
         env:
-          # SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
  
       - name: Quality Gate Check
@@ -43,6 +43,33 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           command: monitor
+      
+      - name: Send Success Email
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "Build Passed"
+          body: "No vulnerabilities found."
+          to: ${{ secrets.EMAIL_USERNAME }}
+          from: GitHub Actions
+ 
+      - name: Send Failure Email
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "Build Failed"
+          body: "Quality Gate failed. Check SonarQube."
+          to: ${{ secrets.EMAIL_USERNAME }}  
+          from: GitHub Actions
+ 
 
   Build:
     name: Build Image & Scan 
@@ -81,7 +108,7 @@ jobs:
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: "Build Passed"
-          body: "No vulnerabilities found."
+          body: "No vulnerabilities found. Image Scan Done"
           to: ${{ secrets.EMAIL_USERNAME }}
           from: GitHub Actions
  
@@ -94,7 +121,7 @@ jobs:
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: "Build Failed"
-          body: "Quality Gate failed. Check SonarQube."
+          body: "Image Scan failed. Check Docker."
           to: ${{ secrets.EMAIL_USERNAME }}  
           from: GitHub Actions
  
